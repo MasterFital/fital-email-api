@@ -9,7 +9,7 @@ export const apiKeys = pgTable("api_keys", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   name: text("name").notNull(), // Nombre descriptivo: "FITAL App", "CRM Sistema", etc.
   keyHash: text("key_hash").notNull().unique(), // SHA256 hash del API key
-  keyPrefix: varchar("key_prefix", { length: 8 }).notNull(), // Primeros 8 chars para identificación
+  keyPrefix: varchar("key_prefix", { length: 16 }).notNull(), // Primeros 12 chars para identificación
   allowedIps: text("allowed_ips").array(), // IPs permitidas (null = todas)
   rateLimitOverride: integer("rate_limit_override"), // Override del rate limit por defecto
   isActive: boolean("is_active").default(true).notNull(),
