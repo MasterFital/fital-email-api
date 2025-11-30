@@ -7,8 +7,7 @@ import {
   type SendEmailCommandInput,
   type SendRawEmailCommandInput
 } from "@aws-sdk/client-ses";
-import { createTransport, type Transporter } from "nodemailer";
-import type SESTransport from "nodemailer/lib/ses-transport";
+import { createTransport } from "nodemailer";
 import { randomUUID } from "crypto";
 
 // Configuración del cliente SES
@@ -20,16 +19,11 @@ const sesClient = new SESClient({
   },
 });
 
-// Nodemailer transport para emails con adjuntos
-let nodemailerTransport: Transporter<SESTransport.SentMessageInfo> | null = null;
-
-function getNodemailerTransport(): Transporter<SESTransport.SentMessageInfo> {
-  if (!nodemailerTransport) {
-    nodemailerTransport = createTransport({
-      SES: { ses: sesClient, aws: { SendRawEmailCommand } },
-    });
-  }
-  return nodemailerTransport;
+// Nodemailer transport para emails con adjuntos (lazy init)
+function getNodemailerTransport() {
+  return createTransport({
+    SES: { ses: sesClient, aws: { SendRawEmailCommand } },
+  } as any);
 }
 
 export interface SendEmailParams {
