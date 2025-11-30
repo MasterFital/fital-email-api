@@ -1,0 +1,26 @@
+{
+  "version": 2,
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "env": {
+    "AWS_API_KEY": "@AWS_API_KEY",
+    "AWS_SECRET_ACCESS_KEY": "@AWS_SECRET_ACCESS_KEY",
+    "AWS_REGION": "@AWS_REGION",
+    "AWS_SES_FROM_EMAIL": "@AWS_SES_FROM_EMAIL",
+    "API_MASTER_KEY": "@API_MASTER_KEY",
+    "DATABASE_URL": "@DATABASE_URL"
+  },
+  "functions": {
+    "api/**/*.ts": {
+      "memory": 1024,
+      "maxDuration": 60
+    }
+  },
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/index.ts",
+      "methods": ["GET", "POST", "PUT", "DELETE", "PATCH"]
+    }
+  ]
+}
