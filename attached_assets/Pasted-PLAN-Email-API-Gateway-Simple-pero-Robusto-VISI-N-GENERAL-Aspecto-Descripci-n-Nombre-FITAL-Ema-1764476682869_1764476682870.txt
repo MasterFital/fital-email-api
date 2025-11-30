@@ -1,0 +1,202 @@
+PLAN: Email API Gateway - Simple pero Robusto
+🎯 VISIÓN GENERAL
+Aspecto	Descripción
+Nombre	FITAL Email API Gateway
+Propósito	Servicio de correo transaccional vía API REST
+Backend	AWS SES (ya configurado en FITAL)
+Autenticación	API Key (x-api-key header)
+Rate Limiting	100 emails/minuto por API key
+Sin Dashboard	Solo API pura, JSON in/out
+📋 ENDPOINTS COMPLETOS
+1️⃣ POST /api/v1/email/send
+Enviar un email simple
+
+curl -X POST https://email-api.fitalmx.com/api/v1/email/send \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "to": "cliente@ejemplo.com",
+    "subject": "Bienvenido a FITAL",
+    "body": "Gracias por registrarte.",
+    "type": "text"
+  }'
+
+Response:
+
+{
+  "success": true,
+  "messageId": "msg_abc123",
+  "status": "sent",
+  "timestamp": "2024-11-30T12:00:00Z"
+}
+
+2️⃣ POST /api/v1/email/send-html
+Enviar email con HTML
+
+curl -X POST https://email-api.fitalmx.com/api/v1/email/send-html \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "to": "cliente@ejemplo.com",
+    "subject": "Tu factura",
+    "html": "<h1>Factura #123</h1><p>Total: $500 USD</p>",
+    "replyTo": "soporte@fitalmx.com"
+  }'
+
+3️⃣ POST /api/v1/email/send-template
+Enviar email con plantilla predefinida
+
+curl -X POST https://email-api.fitalmx.com/api/v1/email/send-template \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "to": "cliente@ejemplo.com",
+    "template": "welcome",
+    "variables": {
+      "nombre": "Juan",
+      "empresa": "FITAL",
+      "enlace": "https://fital.com/activar/xyz"
+    }
+  }'
+
+4️⃣ POST /api/v1/email/send-bulk
+Enviar email masivo (hasta 100 destinatarios)
+
+curl -X POST https://email-api.fitalmx.com/api/v1/email/send-bulk \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "recipients": [
+      {"email": "user1@ejemplo.com", "name": "Usuario 1"},
+      {"email": "user2@ejemplo.com", "name": "Usuario 2"}
+    ],
+    "subject": "Actualización importante",
+    "template": "announcement",
+    "variables": {
+      "fecha": "2024-12-01"
+    }
+  }'
+
+Response:
+
+{
+  "success": true,
+  "sent": 98,
+  "failed": 2,
+  "failedEmails": ["invalid@bad.com", "bounce@test.com"],
+  "batchId": "batch_xyz789"
+}
+
+5️⃣ POST /api/v1/email/send-attachment
+Enviar email con archivos adjuntos
+
+curl -X POST https://email-api.fitalmx.com/api/v1/email/send-attachment \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "to": "cliente@ejemplo.com",
+    "subject": "Documentos adjuntos",
+    "body": "Encuentra tus documentos adjuntos.",
+    "attachments": [
+      {
+        "filename": "factura.pdf",
+        "content": "base64_encoded_content_here",
+        "contentType": "application/pdf"
+      }
+    ]
+  }'
+
+6️⃣ GET /api/v1/email/status/{messageId}
+Consultar estado de un email enviado
+
+curl -X GET https://email-api.fitalmx.com/api/v1/email/status/msg_abc123 \
+  -H "x-api-key: YOUR_API_KEY"
+
+Response:
+
+{
+  "messageId": "msg_abc123",
+  "status": "delivered",
+  "to": "cliente@ejemplo.com",
+  "sentAt": "2024-11-30T12:00:00Z",
+  "deliveredAt": "2024-11-30T12:00:05Z",
+  "opens": 3,
+  "clicks": 1
+}
+
+7️⃣ GET /api/v1/email/stats
+Estadísticas de uso
+
+curl -X GET https://email-api.fitalmx.com/api/v1/email/stats \
+  -H "x-api-key: YOUR_API_KEY"
+
+Response:
+
+{
+  "period": "2024-11",
+  "sent": 15420,
+  "delivered": 15100,
+  "bounced": 120,
+  "opened": 8500,
+  "clicked": 2100,
+  "complained": 5,
+  "deliveryRate": "97.9%",
+  "openRate": "56.3%"
+}
+
+8️⃣ POST /api/v1/email/validate
+Validar dirección de email
+
+curl -X POST https://email-api.fitalmx.com/api/v1/email/validate \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "test@ejemplo.com"
+  }'
+
+Response:
+
+{
+  "email": "test@ejemplo.com",
+  "valid": true,
+  "disposable": false,
+  "domain": "ejemplo.com",
+  "mxRecords": true
+}
+
+9️⃣ GET /api/v1/templates
+Listar plantillas disponibles
+
+curl -X GET https://email-api.fitalmx.com/api/v1/templates \
+  -H "x-api-key: YOUR_API_KEY"
+
+Response:
+
+{
+  "templates": [
+    {"id": "welcome", "name": "Bienvenida", "variables": ["nombre", "enlace"]},
+    {"id": "password_reset", "name": "Reset Password", "variables": ["codigo", "expira"]},
+    {"id": "invoice", "name": "Factura", "variables": ["monto", "fecha", "items"]},
+    {"id": "notification", "name": "Notificación", "variables": ["titulo", "mensaje"]}
+  ]
+}
+
+🔟 POST /api/v1/webhooks
+Registrar webhook para eventos
+
+curl -X POST https://email-api.fitalmx.com/api/v1/webhooks \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "url": "https://tu-app.com/webhook/email",
+    "events": ["delivered", "bounced", "opened", "clicked", "complained"]
+  }'
+
+🏗️ ARQUITECTURA DE ARCHIVOS
+server/
+├── routes/
+│   └── email-gateway.routes.ts    # Todos los endpoints
+├── services/
+│   └── email-gateway/
+│       ├── email-sender.service.ts      # Envío de emails
+│       ├── email-template.service.ts   ...
