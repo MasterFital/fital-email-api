@@ -14,8 +14,8 @@ function getApiKeyFromRequest(req: Request): string {
     // Usar solo el prefijo del API key para privacidad en logs
     return `apikey:${apiKey.substring(0, 12)}`;
   }
-  // Fallback a IP
-  return `ip:${req.ip || req.socket.remoteAddress || "unknown"}`;
+  // Fallback a un identificador único
+  return `unknown:${Date.now()}`;
 }
 
 // Rate limiter global - protege contra ataques DDoS
@@ -30,7 +30,7 @@ export const globalRateLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
-  keyGenerator: (req) => req.ip || "global",
+  validate: { xForwardedForHeader: false, ip: false },
 });
 
 // Rate limiter por API key - límite personalizado por cliente
@@ -53,6 +53,7 @@ export const apiKeyRateLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   keyGenerator: getApiKeyFromRequest,
+  validate: { xForwardedForHeader: false, ip: false },
   handler: (req: Request, res: Response) => {
     const retryAfter = Math.ceil(RATE_LIMIT_WINDOW_MS / 1000);
     res.status(429).json({
@@ -79,6 +80,7 @@ export const readRateLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   keyGenerator: getApiKeyFromRequest,
+  validate: { xForwardedForHeader: false, ip: false },
 });
 
 // Rate limiter estricto para operaciones sensibles
@@ -94,4 +96,5 @@ export const strictRateLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   keyGenerator: getApiKeyFromRequest,
+  validate: { xForwardedForHeader: false, ip: false },
 });

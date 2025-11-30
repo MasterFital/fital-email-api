@@ -80,13 +80,16 @@ function generateMessageId(): string {
 // Enviar email simple (texto o HTML)
 export async function sendEmail(params: SendEmailParams): Promise<EmailResult> {
   const fromEmail = process.env.AWS_SES_FROM_EMAIL || "noreply@example.com";
-  const fromName = process.env.SES_FROM_NAME || "FITAL Email Service";
+  const fromName = process.env.SES_FROM_NAME;
   
   const toAddresses = Array.isArray(params.to) ? params.to : [params.to];
   
+  // Usar formato con nombre solo si está definido, de lo contrario solo el email
+  const source = fromName ? `${fromName} <${fromEmail}>` : fromEmail;
+  
   try {
     const input: SendEmailCommandInput = {
-      Source: `${fromName} <${fromEmail}>`,
+      Source: source,
       Destination: {
         ToAddresses: toAddresses,
         CcAddresses: params.cc || [],
