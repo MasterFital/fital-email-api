@@ -21,20 +21,22 @@ API Gateway profesional de correo transaccional usando AWS SES. Servicio interno
 
 ```env
 # AWS Credentials (IAM User con permisos SES)
-AWS_ACCESS_KEY_ID=AKIA...
-AWS_SECRET_ACCESS_KEY=secret...
-AWS_REGION=us-east-1
+AWS_ACCESS_KEY_ID=<tu_access_key_id>
+AWS_SECRET_ACCESS_KEY=<tu_secret_access_key>
+AWS_REGION=<tu_region>
 
 # SES Configuration
-AWS_SES_FROM_EMAIL=noreply@fitalmx.com
-SES_FROM_NAME=FITAL Email Service
+AWS_SES_FROM_EMAIL=<email_verificado_en_ses>
+SES_FROM_NAME=<nombre_del_servicio>
 
 # API Security
-API_MASTER_KEY=tu_master_key_super_secreta
+API_MASTER_KEY=<genera_una_clave_segura_de_64_caracteres>
 
 # Database
-DATABASE_URL=postgresql://user:pass@host:5432/dbname
+DATABASE_URL=<tu_url_de_postgresql>
 ```
+
+> **IMPORTANTE**: Nunca commits estos valores reales. Usa variables de entorno o secrets del hosting.
 
 ### Permisos IAM Requeridos
 
