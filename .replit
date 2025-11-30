@@ -40,3 +40,10 @@ waitForPort = 5000
 
 [agent]
 integrations = ["javascript_database:1.0.0"]
+
+[userenv]
+
+[userenv.shared]
+API_MASTER_KEY = "fital_master_key_super_secret_2024_production"
+AWS_REGION = "us-east-1"
+SES_FROM_NAME = "FITAL Email Service"
